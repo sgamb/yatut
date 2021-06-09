@@ -38,11 +38,16 @@ def profile(request, username):
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
+    following = Follow.objects.filter(
+        user_id=request.user.id,
+        author_id=author.id
+    )
     return render(request, 'profile.html',
                   {'author': author,
                    'post_count': post_count,
                    'page': page,
-                   'profile': author, }
+                   'profile': author,
+                   'following': following, }
                   )
 
 
@@ -53,12 +58,17 @@ def post_view(request, username, post_id):
     post_count = author.posts.count()
     form = CommentForm()
     comments = post.comments.all()
+    following = Follow.objects.filter(
+        user_id=request.user.id,
+        author_id=author.id
+    )
     return render(request, 'post.html',
                   {'author': author,
                    'post_count': post_count,
                    'post': post,
                    'form': form,
-                   'comments': comments, }
+                   'comments': comments,
+                   'following': following, }
                   )
 
 
@@ -75,7 +85,9 @@ def add_comment(request, username, post_id):
 @login_required
 def follow_index(request):
     """Отображает персональную ленту пользователя"""
-    post_list = request.user.following.posts
+    author_list = request.user.following.all()
+    assert author_list == User.objects.get(pk=2)
+    post_list = Post.objects.all()  #  TEMP
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -89,7 +101,7 @@ def profile_follow(request, username):
         user_id=request.user.id,
         author_id=get_object_or_404(User, username=username).id
     )
-    return redirect(request.path)
+    return redirect('profile', username)
 
 
 @login_required
@@ -98,7 +110,7 @@ def profile_unfollow(request, username):
         user_id=request.user.id,
         author_id=get_object_or_404(User, username=username).id
     ).delete()
-    return redirect(request.path)
+    return redirect('profile', username)
 
 
 @login_required
