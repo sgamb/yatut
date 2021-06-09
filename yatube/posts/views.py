@@ -41,7 +41,8 @@ def profile(request, username):
     return render(request, 'profile.html',
                   {'author': author,
                    'post_count': post_count,
-                   'page': page, }
+                   'page': page,
+                   'profile': author, }
                   )
 
 
