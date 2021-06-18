@@ -110,7 +110,7 @@ class PostPagesTests(TestCase):
         first_post = response.context.get("page").object_list[0]
         self.assertIsInstance(first_post, Post)
         self.assertEqual(first_post, self.post)
-        self.assertEqual(response.context.get("author"), self.user)
+        self.assertEqual(response.context.get("profile"), self.user)
         self.assertEqual(response.context.get("post_count"), 1)
 
     def test_post_view_pass_correct_context(self):
@@ -121,7 +121,7 @@ class PostPagesTests(TestCase):
         )
         self.assertEqual(response.context.get("post"), self.post)
         self.assertEqual(response.context.get("post_count"), 1)
-        self.assertEqual(response.context.get("author"), self.user)
+        self.assertEqual(response.context.get("profile"), self.user)
 
     def test_nonexistent_page_return_404(self):
         response = self.authorized_client.get("/abacaba_page_not_exists/")

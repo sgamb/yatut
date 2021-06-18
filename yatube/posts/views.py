@@ -43,8 +43,7 @@ def profile(request, username):
         author_id=author.id
     )
     return render(request, 'profile.html',
-                  {'author': author,
-                   'post_count': post_count,
+                  {'post_count': post_count,
                    'page': page,
                    'profile': author,
                    'following': following, }
@@ -63,7 +62,7 @@ def post_view(request, username, post_id):
         author_id=author.id
     )
     return render(request, 'post.html',
-                  {'author': author,
+                  {'profile': author,
                    'post_count': post_count,
                    'post': post,
                    'form': form,
