@@ -31,44 +31,45 @@ def group_posts(request, slug):
                   )
 
 
-def profile(request, username):
-    author = get_object_or_404(User, username=username)
-    post_list = author.posts.all()
+def get_author_card_data(author, request):
     post_count = author.posts.count()
-    paginator = Paginator(post_list, 10)
-    page_number = request.GET.get('page')
-    page = paginator.get_page(page_number)
     following = Follow.objects.filter(
         user_id=request.user.id,
         author_id=author.id
     )
-    return render(request, 'profile.html',
-                  {'post_count': post_count,
-                   'page': page,
-                   'profile': author,
-                   'following': following, }
-                  )
+    following_number = User.objects.filter(following__author=author).count()
+    follower_number = User.objects.filter(follower__user=author).count()
+    return {
+        'post_count': post_count,
+        'profile': author,
+        'following': following,
+        'following_number': following_number,
+        'follower_number': follower_number,
+    }
+
+
+def profile(request, username):
+    author = get_object_or_404(User, username=username)
+    post_list = author.posts.all()
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    context = get_author_card_data(author, request)
+    context.update(page=page)
+    return render(request, 'profile.html', context)
 
 
 def post_view(request, username, post_id):
     post = get_object_or_404(Post.objects.select_related('author'),
                              id=post_id, author__username=username)
     author = post.author
-    post_count = author.posts.count()
     form = CommentForm()
     comments = post.comments.all()
-    following = Follow.objects.filter(
-        user_id=request.user.id,
-        author_id=author.id
-    )
-    return render(request, 'post.html',
-                  {'profile': author,
-                   'post_count': post_count,
-                   'post': post,
-                   'form': form,
-                   'comments': comments,
-                   'following': following, }
-                  )
+    context = get_author_card_data(author, request)
+    context.update(post=post,
+                   form=form,
+                   comments=comments)
+    return render(request, 'post.html', context)
 
 
 def add_comment(request, username, post_id):
@@ -95,10 +96,11 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    Follow.objects.create(
-        user_id=request.user.id,
-        author_id=get_object_or_404(User, username=username).id
-    )
+    if username != request.user.username:
+        Follow.objects.create(
+            user_id=request.user.id,
+            author_id=get_object_or_404(User, username=username).id
+        )
     return redirect('profile', username)
 
 
