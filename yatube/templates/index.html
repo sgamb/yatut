@@ -9,7 +9,7 @@
     {% include "include/menu.html" %}
 
     {% load cache %}
-    {% cache 20 index_page %}
+    {% cache 20 index_page using key page %}
 
       {% for post in page %}
         {% include "include/post_item.html" with post=post %}

@@ -78,20 +78,19 @@ def add_comment(request, username, post_id):
         comment.post_id = post_id
         comment.author_id = request.user.id
         comment.save()
-        return redirect(request.path, username, post_id)
+    return redirect('post', username, post_id)
 
 
 @login_required
 def follow_index(request):
     """Отображает персональную ленту пользователя"""
-    author_list = request.user.following.all()
-    assert author_list == User.objects.get(pk=2)
-    post_list = Post.objects.all()  #  TEMP
+    post_list = Post.objects.filter(author__following__user=request.user.id)
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     return render(request, 'follow.html',
-                  {'page': page})
+                  {'page': page}
+                  )
 
 
 @login_required
