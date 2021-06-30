@@ -9,7 +9,9 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from posts.models import Group, Post, User
+from posts.models import Follow, Group, Post, User
+
+TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 
 class PostPagesTests(TestCase):
@@ -196,9 +198,6 @@ class GroupPagesTest(TestCase):
         self.assertEqual(len(response.context.get("page").object_list), 0)
 
 
-TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
-
-
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class ImageViewTest(TestCase):
     """Проверяет, что пост с картинкой порождает объект
@@ -293,4 +292,53 @@ class CacheViewTest(TestCase):
         self.assertIsNone(response.context)
         time.sleep(20)
         response = self.guest_client.get(reverse("index"))
+        self.assertTrue(response.context.get("page").object_list)
+
+
+class FollowViewTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        FollowViewTest.author = User.objects.create(username="sergey")
+        FollowViewTest.follower = User.objects.create(username="bob")
+        FollowViewTest.post = Post.objects.create(
+            text="Test post text",
+            author_id=FollowViewTest.author.id,
+        )
+
+    def setUp(self):
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.follower)
+        cache.clear()
+
+    def test_authorized_user_can_follow_and_unfollow(self):
+        self.authorized_client.get(
+            reverse("profile_follow",
+                    kwargs={"username": self.author.username}
+                    )
+        )
+        self.assertTrue(Follow.objects.filter(
+            user=self.follower, author=self.author
+        ).exists())
+        self.authorized_client.get(
+            reverse("profile_unfollow",
+                    kwargs={"username": self.author.username}
+                    )
+        )
+        self.assertFalse(Follow.objects.filter(
+            user=self.follower, author=self.author
+        ).exists())
+
+    def test_post_is_displayed_only_for_follower(self):
+        """Пост автора не отображается для не фолловера
+        и отображается для фолловера"""
+        response = self.authorized_client.get(reverse("follow_index"))
+        self.assertFalse(response.context.get("page").object_list,
+                         self.post)
+        self.authorized_client.get(
+            reverse("profile_follow",
+                    kwargs={"username": self.author.username}
+                    )
+        )
+        response = self.authorized_client.get(reverse("follow_index"))
         self.assertTrue(response.context.get("page").object_list)

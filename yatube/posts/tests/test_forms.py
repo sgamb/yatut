@@ -7,7 +7,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 from posts.forms import PostForm
-from posts.models import Post, User
+from posts.models import Comment, Post, User
 
 
 class PostCreateFormTests(TestCase):
@@ -138,3 +138,28 @@ class PostCreateFormTests(TestCase):
     def test_form_help_text(self):
         text_help_text = PostCreateFormTests.form.fields["text"].help_text
         self.assertEqual(text_help_text, "Пишите, что захотите")
+
+
+class CommentFormTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        CommentFormTest.author = User.objects.create(username="ponistar")
+        CommentFormTest.post = Post.objects.create(
+            text="Comment it please",
+            author_id=CommentFormTest.author.id,
+        )
+
+    def setUp(self):
+        self.guest_client = Client()
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.author)
+
+    def test_only_authorized_client_can_comment(self):
+        self.guest_client.post(
+            reverse("comment", kwargs={"username": self.author.username,
+                                       "post_id": self.post.id}),
+            data={"text": "comment text"},
+            follow=True
+        )
+        self.assertFalse(Comment.objects.all().exists())

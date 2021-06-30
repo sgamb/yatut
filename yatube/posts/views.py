@@ -72,6 +72,7 @@ def post_view(request, username, post_id):
     return render(request, 'post.html', context)
 
 
+@login_required
 def add_comment(request, username, post_id):
     form = CommentForm(request.POST)
     if form.is_valid():
@@ -96,7 +97,12 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    if username != request.user.username:
+    #  Add uniqueness check
+    following = Follow.objects.filter(
+        user_id=request.user.id,
+        author_id=get_object_or_404(User, username=username).id
+    ).exists()
+    if username != request.user.username and not following:
         Follow.objects.create(
             user_id=request.user.id,
             author_id=get_object_or_404(User, username=username).id
@@ -143,7 +149,8 @@ def post_edit(request, username, post_id):
                   {'form': form,
                    'header': 'Редактировать запись',
                    'title': 'Редактировать запись',
-                   'edit': True, }
+                   'edit': True,
+                   'post': post, }
                   )
 
 
