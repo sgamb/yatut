@@ -5,10 +5,9 @@ class StaticURLTests(TestCase):
     def setUp(self):
         self.guest_client = Client()
 
-    def test_about_author_url_exists_at_desired_locataion(self):
-        response = self.guest_client.get("/about/author/")
-        self.assertEqual(response.status_code, 200)
-
-    def test_about_tech_url_exists_at_desired_location(self):
-        response = self.guest_client.get("/about/tech/")
-        self.assertEqual(response.status_code, 200)
+    def test_about_urls_exists_at_desired_location(self):
+        urls = ("/about/author/", "/about/tech/")
+        for url in urls:
+            with self.subTest(url=url):
+                response = self.guest_client.get(url)
+                self.assertEqual(response.status_code, 200)
