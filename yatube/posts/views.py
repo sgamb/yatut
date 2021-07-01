@@ -37,8 +37,8 @@ def get_author_card_data(author, request):
         user_id=request.user.id,
         author_id=author.id
     )
-    following_number = User.objects.filter(following__author=author).count()
-    follower_number = User.objects.filter(follower__user=author).count()
+    following_number = author.following.all().count()
+    follower_number = author.follower.all().count()
     return {
         'post_count': post_count,
         'profile': author,
@@ -97,15 +97,16 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    #  Add uniqueness check
+    """Осуществляет подписку"""
+    author = get_object_or_404(User, username=username)
     following = Follow.objects.filter(
         user_id=request.user.id,
-        author_id=get_object_or_404(User, username=username).id
+        author_id=author.id
     ).exists()
-    if username != request.user.username and not following:
+    if request.user != author and not following:
         Follow.objects.create(
             user_id=request.user.id,
-            author_id=get_object_or_404(User, username=username).id
+            author_id=author.id
         )
     return redirect('profile', username)
 
