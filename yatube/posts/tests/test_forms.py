@@ -28,6 +28,7 @@ class PostCreateFormTests(TestCase):
         shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
 
     def setUp(self):
+        self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
@@ -46,7 +47,7 @@ class PostCreateFormTests(TestCase):
         self.assertEqual(Post.objects.count(), posts_count + 1)
         self.assertTrue(
             Post.objects.filter(
-                text="Hello test"
+                text=form_data["text"]
             ).exists()
         )
 
@@ -78,26 +79,26 @@ class PostCreateFormTests(TestCase):
         self.assertEqual(Post.objects.count(), post_count + 1)
         self.assertTrue(
             Post.objects.filter(
-                text="Hello image"
+                text=form_data["text"]
             ).exists()
         )
         self.assertIsNotNone(
             Post.objects.get(
-                text="Hello image"
+                text=form_data["text"]
             ).image
         )
 
     def test_edit_post(self):
         """Пост можно изменить"""
         post_count = Post.objects.count()
-        new_form_data = {
+        form_data = {
             "text": "Edit text"
         }
         response = self.authorized_client.post(
             reverse("post_edit",
                     kwargs={"username": self.user.username,
                             "post_id": self.post.id}),
-            data=new_form_data,
+            data=form_data,
             follow=True
         )
         self.assertRedirects(response, reverse("post", kwargs={
@@ -107,7 +108,7 @@ class PostCreateFormTests(TestCase):
         self.assertEqual(Post.objects.count(), post_count)
         self.assertTrue(
             Post.objects.filter(
-                text="Edit text"
+                text=form_data["text"]
             ).exists()
         )
 
@@ -129,6 +130,17 @@ class PostCreateFormTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
+    def test_guest_cant_do_post(self):
+        posts_count = Post.objects.count()
+        form_data = {"text": "i want to post"}
+        response = self.guest_client.post(
+            reverse("new"),
+            data=form_data,
+            follow=True
+        )
+        self.assertRedirects(response, f"/auth/login/?next={reverse('new')}")
+        self.assertEqual(Post.objects.count(), posts_count)
+
     def test_form_labels(self):
         text_label = PostCreateFormTests.form.fields["text"].label
         self.assertEqual(text_label, "Текст")
@@ -145,6 +157,7 @@ class CommentFormTest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         CommentFormTest.author = User.objects.create(username="ponistar")
+        CommentFormTest.user = User.objects.create(username="user")
         CommentFormTest.post = Post.objects.create(
             text="Comment it please",
             author_id=CommentFormTest.author.id,
@@ -153,7 +166,23 @@ class CommentFormTest(TestCase):
     def setUp(self):
         self.guest_client = Client()
         self.authorized_client = Client()
-        self.authorized_client.force_login(self.author)
+        self.authorized_client.force_login(self.user)
+
+    def test_authorized_client_can_comment(self):
+        """Комментарий создается"""
+        comments_count = Comment.objects.count()
+        form_data = {"text": "ha ha"}
+        kwargs = {"username": self.author.username, "post_id": self.post.id}
+        response = self.authorized_client.post(
+            reverse("comment", kwargs=kwargs),
+            data=form_data,
+            follow=True
+        )
+        self.assertRedirects(response, reverse("post", kwargs=kwargs))
+        self.assertEqual(Comment.objects.count(), comments_count + 1)
+        comment = response.context["comments"][0]
+        self.assertEqual(comment.author, self.user)
+        self.assertEqual(comment.text, form_data["text"])
 
     def test_only_authorized_client_can_comment(self):
         self.guest_client.post(
@@ -162,4 +191,4 @@ class CommentFormTest(TestCase):
             data={"text": "comment text"},
             follow=True
         )
-        self.assertFalse(Comment.objects.all().exists())
+        self.assertFalse(Comment.objects.exists())

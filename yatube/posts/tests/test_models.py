@@ -13,7 +13,6 @@ class PostsModelsTest(TestCase):
         )
         cls.author = User.objects.create(
             first_name="tester",
-            id="1",
             password="testpasswd"
         )
         cls.post = Post.objects.create(

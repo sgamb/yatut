@@ -311,7 +311,8 @@ class FollowViewTest(TestCase):
         self.authorized_client.force_login(self.follower)
         cache.clear()
 
-    def test_authorized_user_can_follow_and_unfollow(self):
+    def test_authorized_user_can_follow(self):
+        """Авторизованный пользователь может подписаться"""
         self.authorized_client.get(
             reverse("profile_follow",
                     kwargs={"username": self.author.username}
@@ -320,6 +321,13 @@ class FollowViewTest(TestCase):
         self.assertTrue(Follow.objects.filter(
             user=self.follower, author=self.author
         ).exists())
+
+    def test_authorized_user_can_unfollow(self):
+        """Авторизованный пользователь может отписаться"""
+        Follow.objects.create(
+            user=self.follower,
+            author=self.author
+        )
         self.authorized_client.get(
             reverse("profile_unfollow",
                     kwargs={"username": self.author.username}
@@ -329,16 +337,17 @@ class FollowViewTest(TestCase):
             user=self.follower, author=self.author
         ).exists())
 
-    def test_post_is_displayed_only_for_follower(self):
-        """Пост автора не отображается для не фолловера
-        и отображается для фолловера"""
-        response = self.authorized_client.get(reverse("follow_index"))
-        self.assertFalse(response.context.get("page").object_list,
-                         self.post)
-        self.authorized_client.get(
-            reverse("profile_follow",
-                    kwargs={"username": self.author.username}
-                    )
+    def test_post_is_displayed_for_follower(self):
+        """Пост ображается для подписчика"""
+        Follow.objects.create(
+            user=self.follower,
+            author=self.author
         )
         response = self.authorized_client.get(reverse("follow_index"))
-        self.assertTrue(response.context.get("page").object_list)
+        self.assertEqual(response.context.get("page").object_list[0],
+                         self.post)
+
+    def test_post_is_not_displayed_for_non_subscribers(self):
+        """Пост не ображается для не подписчика"""
+        response = self.authorized_client.get(reverse("follow_index"))
+        self.assertFalse(response.context.get("page").object_list)
