@@ -138,7 +138,8 @@ class PostCreateFormTests(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertRedirects(response, f"/auth/login/?next={reverse('new')}")
+        login_url = reverse('login')
+        self.assertRedirects(response, f"{login_url}?next={reverse('new')}")
         self.assertEqual(Post.objects.count(), posts_count)
 
     def test_form_labels(self):
