@@ -4,18 +4,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <!-- Title -->
   <title>{% block title %}The Last Social Media You'll Ever Need{% endblock %} | Yatut</title>
-  <!-- Загрузка статики -->
   {% load static %}
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
     rel="stylesheet"
     integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x"
     crossorigin="anonymous">
-  <!-- link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}">
-  <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
-  <script src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script -->
 </head>
 
 <body>
@@ -25,7 +20,7 @@
       <!-- Header -->
       <h1>{% block header %}{# The Last Social Media You'll Ever Need #}{% endblock %}</h1>
       {% block content %}
-      <!-- Содержимое страницы -->
+        <!-- Содержимое страницы -->
       {% endblock %}
     </div>
   </main>

@@ -56,20 +56,33 @@ def profile(request, username):
     page = paginator.get_page(page_number)
     context = get_author_card_data(author, request)
     context.update(page=page)
-    return render(request, 'profile.html', context)
+    return render(
+        request,
+        'profile.html',
+        context,
+    )
 
 
 def post_view(request, username, post_id):
-    post = get_object_or_404(Post.objects.select_related('author'),
-                             id=post_id, author__username=username)
+    post = get_object_or_404(
+        Post.objects.select_related('author'),
+        id=post_id,
+        author__username=username
+    )
     author = post.author
     form = CommentForm()
     comments = post.comments.all()
     context = get_author_card_data(author, request)
-    context.update(post=post,
-                   form=form,
-                   comments=comments)
-    return render(request, 'post.html', context)
+    context.update(
+        post=post,
+        form=form,
+        comments=comments,
+    )
+    return render(
+        request,
+        'post.html',
+        context
+    )
 
 
 @login_required
