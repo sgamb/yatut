@@ -8,6 +8,7 @@ on:
 
 jobs:
   clone_and_check:
+    name: Clone and check flake8
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -40,7 +41,7 @@ jobs:
         flake8 tests --count --exit-zero --max-complexity=10 --max-line-length=79 --statistics
 
   build_and_push:
-    name: Push Docker image to Docker Hub
+    name: Build and push to Docker Hub
     runs-on: ubuntu-latest
     needs: clone_and_check
     steps:
@@ -80,5 +81,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            ls
-            docker images
+            docker pull
+            docker compose down
+            docker compose up
