@@ -1,20 +1,19 @@
 import os
 from datetime import timedelta
-from dotenv import load_dotenv
 
-load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = 'n-fwr-t995z-_xrv-(zn%$%bv(l0fsld))$vb%plfhsah%+pbu'
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', False)
 
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '[::1]',
-    'testserver'
+    'testserver',
+    'sgamb.ru',
 ]
 
 INTERNAL_IPS = [
