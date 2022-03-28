@@ -81,6 +81,5 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            docker pull sgamb/yatube
-            docker compose down
-            docker compose up
+            docker pull sgamb/yatube:latest
+            docker compose up --detach
