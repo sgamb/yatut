@@ -11,12 +11,13 @@ from .models import Follow, Group, Post, User
 def index(request):
     post_list = Post.objects.all()
     paginator = Paginator(post_list, 10)
-    #  Вытаскиваем номер страницы из адресной строки
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, 'index.html',
-                  {'page': page, }
-                  )
+    return render(
+        request,
+        'index.html',
+        {'page': page, }
+    )
 
 
 def group_posts(request, slug):
@@ -25,10 +26,12 @@ def group_posts(request, slug):
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, 'group.html',
-                  {'group': group,
-                   'page': page, }
-                  )
+    return render(
+        request,
+        'group.html',
+        {'group': group,
+         'page': page, }
+    )
 
 
 def get_author_card_data(author, request):
