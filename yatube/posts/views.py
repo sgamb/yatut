@@ -10,9 +10,10 @@ from .models import Follow, Group, Post, User
 @cache_page(20)
 def index(request):
     post_list = Post.objects.all()
-    paginator = Paginator(post_list, 10)
+    paginator = Paginator(post_list, 30)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
+    page = [page[:10], page[10:20], page[20:]]
     return render(
         request,
         'index.html',

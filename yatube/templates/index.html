@@ -10,20 +10,16 @@
 
     {% load cache %}
     {% cache 20 index_page using key page %}
-    
-    <div class="row">
 
-      {% for post in page %}
-      
-      	<div class="col">
-      	
-          {% include "include/post_item.html" with post=post %}
-          
-        </div>
-        
-      {% endfor %}
-      
-    </div>
+      <div class="row">
+        {% for col in page %}
+          <div class="col-md-4">
+            {% for post in col %}
+              {% include "include/post_item.html" with post=post %}
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
 
     {% endcache %}
 
