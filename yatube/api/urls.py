@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from django.urls import include, path
 from drf_yasg import openapi
+from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions, routers
 
@@ -32,14 +33,22 @@ urlpatterns = [
     path('v1/', include('djoser.urls.jwt')),
 ]
 
+
+class BothHttpAndHttpsSchemaGenerator(OpenAPISchemaGenerator):
+    def get_schema(self, request=None, public=False):
+        schema = super().get_schema(request, public)
+        schema.schemes = ["http", "https"]
+        return schema
+
+
 schema_view = get_schema_view(
     openapi.Info(
         title="Yatut API",
         default_version='v1',
         description="Документация для приложения api проекта yatut",
-        url="https://sgamb.ru/api/v1",
         contact=openapi.Contact(email="sgamb2000@gmail.com"),
         license=openapi.License(name="BSD License"),
+        generator_class=BothHttpAndHttpsSchemaGenerator,
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
