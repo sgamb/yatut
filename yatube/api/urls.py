@@ -48,9 +48,9 @@ schema_view = get_schema_view(
         description="Документация для приложения api проекта yatut",
         contact=openapi.Contact(email="sgamb2000@gmail.com"),
         license=openapi.License(name="BSD License"),
-        generator_class=BothHttpAndHttpsSchemaGenerator,
     ),
     public=True,
+    generator_class=BothHttpAndHttpsSchemaGenerator,
     permission_classes=(permissions.AllowAny,),
 )
 
