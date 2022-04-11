@@ -37,7 +37,7 @@ schema_view = get_schema_view(
         title="Yatut API",
         default_version='v1',
         description="Документация для приложения api проекта yatut",
-        # terms_of_service="URL страницы с пользовательским соглашением",
+        url="https://sgamb.ru/api/v1",
         contact=openapi.Contact(email="sgamb2000@gmail.com"),
         license=openapi.License(name="BSD License"),
     ),
