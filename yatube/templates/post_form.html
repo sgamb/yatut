@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+<!-- New post or edit -->
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
 {% load user_filters %}
@@ -9,22 +10,43 @@
       <div class="card-header">{{ header }}</div>
       <div class="card-body">
 
-        <form method="post" enctype="multipart/form-data">
+        <form
+          method="post"
+          enctype="multipart/form-data">
+
           {% csrf_token %}
+
           {% for field in form %}
+            <div
+              class="form-group row"
+              aria-required={% if field.field.required %}"true"{% else %}"false"{% endif %}>
+              
+              <label
+                for="{{ field.id_for_label }}"
+                class="col-md-4 col-form-label text-md-right">
+                
+                {{ field.label }}{% if field.field.required %}
+                  <span class="required">*</span>
+                {% endif %}
+              </label>
+              
+              <div 
+                class="col-md-6 mt-2">
 
-          <div class="form-group row" aria-required={% if field.field.required %}"true"{% else %}"false"{% endif %}>
-            <label for="{{ field.id_for_label }}" class="col-md-4 col-form-label text-md-right">{{ field.label }}{% if field.field.required %}<span class="required">*</span>{% endif %}</label>
-            <div class="col-md-6">
+                {{ field|addclass:"form-control" }}
 
-              {{ field|addclass:"form-control" }}
+                {% if field.help_text %}
+                  <small
+                    id="{{ field.id_for_label }}-help"
+                    class="form-text text-muted">
+                    
+                    {{ field.help_text|safe }}
 
-              {% if field.help_text %}
-              <small id="{{ field.id_for_label }}-help" class="form-text text-muted">{{ field.help_text|safe }}</small>
-              {% endif %}
+                  </small>
+                {% endif %}
 
+              </div>
             </div>
-          </div>
           {% endfor %}
 
           <div class="col-md-6 offset-md-4">

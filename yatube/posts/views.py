@@ -139,45 +139,59 @@ def profile_unfollow(request, username):
 
 @login_required
 def new_post(request):
+    """Returns the form to create a post or creates a post"""
     form = PostForm(request.POST or None, files=request.FILES or None)
     if form.is_valid():
         post = form.save(commit=False)
         post.author_id = request.user.id
         post.save()
         return redirect('index')
-    return render(request, 'post_form.html',
-                  {'form': form,
-                   'title': 'Новая запись',
-                   'header': 'Добавить запись', }
-                  )
+    return render(
+        request,
+        'post_form.html',
+        {
+            'form': form,
+            'title': 'Новая запись',
+            'header': 'Добавить запись',
+        },
+    )
 
 
 @login_required
 def post_edit(request, username, post_id):
+    """Allows you to change the post"""
     post = get_object_or_404(Post, id=post_id)
     if request.user.id != post.author_id:
         return redirect('post', username, post_id)
-    form = PostForm(request.POST or None,
-                    files=request.FILES or None,
-                    instance=post)
+    form = PostForm(
+        request.POST or None,
+        files=request.FILES or None,
+        instance=post,
+    )
     if form.is_valid():
         form.save()
         return redirect('post', username, post_id)
-    return render(request, 'post_form.html',
-                  {'form': form,
-                   'header': 'Редактировать запись',
-                   'title': 'Редактировать запись',
-                   'edit': True,
-                   'post': post, }
-                  )
+    return render(
+        request,
+        'post_form.html',
+        {
+            'form': form,
+            'header': 'Редактировать запись',
+            'title': 'Редактировать запись',
+            'edit': True,
+            'post': post,
+        },
+    )
 
 
 def page_not_found(request, exception):
     return render(
         request,
         "misc/404.html",
-        {"path": request.path},
-        status=404
+        {
+            "path": request.path
+        },
+        status=404,
     )
 
 
