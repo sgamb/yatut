@@ -1,15 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Последние обновления на сайте{% endblock %}
-{% block header %}Последние обновления на сайте{% endblock %}
+{% block header %}<span style="color:blue">Ya</span>tut{% endblock %}
 {% block content %}
 {% load thumbnail %}
 
   <!--div class="container"-->
 
+{% comment %}
     {% include "include/menu.html" %}
+
 
     {% load cache %}
     {% cache 20 index_page using key page %}
+{% endcomment %}
 
       <div class="row">
         {% for col in page %}
@@ -21,7 +24,7 @@
         {% endfor %}
       </div>
 
-    {% endcache %}
+ {% comment %}   {% endcache %} {% endcomment %}
 
   {% include "include/paginator.html" %}
 
