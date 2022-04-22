@@ -25,7 +25,8 @@ services:
       - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - /etc/nginx/ssl/
+      - ./favicon.ico:/var/html/favicon.ico
+      - /etc/nginx/ssl/:/etc/nginx/ssl/
       - static_value:/var/html/static/
       - media_volume:/var/html/media/
 
