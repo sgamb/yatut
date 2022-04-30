@@ -12,7 +12,11 @@
 
         {% for error in form.errors %}
         <div class="alert alert-danger" role="alert">
-          {{ error }}
+          {% if error == "username" %}
+            Юзернэйм занят, сори
+          {% elif error == "password2" %}
+            Пароль не подходит, сори
+          {% endif %}
         </div>
         {% endfor %}
 
