@@ -33,7 +33,7 @@ pluggy==0.13.1
 psycopg2-binary==2.8.6
 py==1.11.0
 pycparser==2.21
-PyJWT==2.3.0
+PyJWT==2.4.0
 pyparsing==2.4.6
 pytest==5.3.5
 pytest-django==3.8.0
