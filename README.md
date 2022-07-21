@@ -1,7 +1,5 @@
-# Yatut
+# Ya ne tut
 
 ![my workflow](https://github.com/sgamb/yatut/actions/workflows/python-app.yml/badge.svg)
 
-### Сайт функционирует и доступен по ссылке https://sgamb.ru
-
-Django web blog проект с api, равернутый на WPS с помощью Docker
+Мои скромные попытки изучения джанги, а также ее апишного брата drf. На самом деле даже большее внимание было уделено разворачиванию сайта на удаленном сервере, настройка github actions и docker`a.
